@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32616.157
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaminDis", "MaminDis\MaminDis.csproj", "{114AB61A-F6DC-4D80-9423-59585510D78D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{114AB61A-F6DC-4D80-9423-59585510D78D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{114AB61A-F6DC-4D80-9423-59585510D78D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{114AB61A-F6DC-4D80-9423-59585510D78D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{114AB61A-F6DC-4D80-9423-59585510D78D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {38ADBC13-976C-41E1-B73A-667A8B41861A}
+	EndGlobalSection
+EndGlobal

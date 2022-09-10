@@ -1,0 +1,214 @@
+﻿@model Room
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@Model.Title</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MaminDis.styles.css" asp-append-version="true" />
+    <script src="//cdn.rawgit.com/dcodeIO/protobuf.js/6.X.X/dist/protobuf.js"></script>
+</head>
+<body class="text-center accept-policy">
+    <h3 class="h3 mt-3 bg-secondary p-4">
+        @Model.Title.ToString()
+    </h3>
+    <main class="d-flex flex-row justify-content-center">
+        <ul class="list-group col-md-4 col-10 text-center" id="userslist">
+        </ul>
+    </main>
+    <button onclick="mute()" class="btn rounded-circle mt-5 rounded-3 btn-outline-success" id="btn_mute">Mute</button>
+    <button onclick="deafen()" class="btn rounded-circle mt-5 rounded-3 btn-outline-success" id="btn_deafen">Deafen</button>
+    <audio id="recordedAudio" autoplay hidden></audio>
+</body>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.js" integrity="sha512-dMiBqqEV5i3KqpAdsgQSSZ72DnNib7otY0X+b/Tnn1EmLym1dxuZ19csdZqBnfDniKd9bmNtzStQzuMrIa5Ngw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+@*<script>
+    async function doWorks() {
+        function UpdateUsersList() {
+            $.get("/getusers/@Model.Id").then((data) => {
+                console.log(data);
+                document.getElementById("userslist").innerHTML = "";
+                data.forEach((member) => {
+                    document.getElementById("userslist").innerHTML += ("<li class = 'list-group-item-secondary list-group-item text-decoration-none d-block p-3' >" + member.name + "</li>")
+                });
+            })
+        }
+
+        const vcSocket = new WebSocket("wss://@ViewBag.vcSocketUrl");
+        vcSocket.binaryType = "arraybuffer";
+
+        vcSocket.addEventListener("open", () => {
+            UpdateUsersList();
+        });
+        const Playcontext = new AudioContext();
+        vcSocket.addEventListener("message", (e) => {
+
+            var myArrayBuffer = new AudioBuffer({
+                length: 512,
+                sampleRate: 48000
+            });
+
+            myArrayBuffer.copyToChannel((new Float32Array(e.data)), 0, 0)
+            const source = Playcontext.createBufferSource();
+
+            source.buffer = myArrayBuffer;
+
+            source.connect(Playcontext.destination);
+
+            source.start();
+
+        });
+
+        //var Recordcontext = new AudioContext();
+        //await Recordcontext.audioWorklet.addModule('/js/my-audio-processor.js')
+        //const whiteNoiseNode = new AudioWorkletNode(Recordcontext, 'my-audio-processor')
+
+        //whiteNoiseNode.connect(Recordcontext.destination)
+
+        var audiobuffers = [];
+        const handleSuccess = async function(stream) {
+            const Recordcontext = new AudioContext();
+        const source = Recordcontext.createMediaStreamSource(stream);
+        const processor = Recordcontext.createScriptProcessor(512, 1, 1);
+
+        source.connect(processor);
+        processor.connect(Recordcontext.destination);
+
+
+
+        //let i = 0
+        //setInterval(() => {
+        //    processor.onaudioprocess = function(e) {
+        //        if (i % 10 == 0 ) {
+        //            var array = new Float32Array(512);
+        //            e.inputBuffer.copyFromChannel(array, 0, 0);
+        //            vcSocket.send(array);
+        //            console.log("demo")
+        //        }
+        //        i++
+        //    };
+        //    console.log("br")
+        //}, 1000);
+
+
+        processor.onaudioprocess = function(e) {
+            var array = new Float32Array(512);
+            e.inputBuffer.copyFromChannel(array, 0, 0);
+            vcSocket.send(array);
+        };
+    //};
+    //navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+    //    .then(handleSuccess);
+
+    //const usersSocket = new WebSocket("wss://@ViewBag.usersSocketUrl");
+    //usersSocket.addEventListener("message", (e) => {
+    //    UpdateUsersList();
+    //});
+    }
+    doWorks();
+
+
+
+</script>*@
+
+<script>
+    var muted = false;
+    var deafened = false;
+    var recorder;
+    function UpdateUsersList() {
+        $.get("/getusers/@Model.Id").then((data) => {
+            console.log(data);
+            document.getElementById("userslist").innerHTML = "";
+            data.forEach((member) => {
+                document.getElementById("userslist").innerHTML += ("<li class = 'list-group-item-secondary list-group-item text-decoration-none d-block p-3' >" + member.name + "</li>")
+            });
+        });
+    }
+
+    const vcSocket = new WebSocket("wss://@ViewBag.vcSocketUrl");
+
+    vcSocket.addEventListener("open", () => {
+        UpdateUsersList();
+    });
+    function mute() {
+        muted = !muted;
+        if (!muted) {
+            record(recorder);
+            document.getElementById("btn_mute").innerHTML = "Mute";
+        } else {
+            document.getElementById("btn_mute").innerHTML = "UnMute";
+        }
+
+    }
+    let recordedAudio = document.getElementById("recordedAudio");
+    vcSocket.addEventListener("message", (e) => {
+        if (!deafened) {
+            recordedAudio.src = URL.createObjectURL(e.data);
+        }
+    });
+    async function record(recorder) {
+        while (!muted) {
+            recorder.start();
+            await new Promise(r => setTimeout(r, 850)).then(() => {
+                recorder.stop();
+            });
+        }
+
+    }
+    function deafen() {
+        if (deafened) {
+            deafened = false;
+            muted = false;
+            document.getElementById("btn_mute").innerHTML = "Mute";
+            document.getElementById("btn_deafen").innerHTML = "Deafen";
+        } else {
+            document.getElementById("btn_mute").innerHTML = "UnMute";
+            document.getElementById("btn_deafen").innerHTML = "UnDeafen";
+            deafened = true;
+            muted = true;
+        }
+
+    }
+    navigator.mediaDevices.getUserMedia({ audio: true },
+        function(stream) {
+            //console.log(stream);
+        },
+        function(e) {
+            alert('Error capturing audio.');
+        }).then((str) => {
+            recorder = new window.MediaRecorder(str);
+            recorder.addEventListener("dataavailable", (e) => {
+                e.length = 10000;
+                console.log("sent");
+                vcSocket.send(e.data);
+            });
+            record(recorder);
+        });
+    userStatusWS = new WebSocket("wss://@ViewBag.usersSocketUrl");
+    userStatusWS.addEventListener("message", (e) => {
+        UpdateUsersList();
+    });
+</script>
+</html>
+
+
+
+
+
+
+
+@*        usersSocket.addEventListener("message", (e) => {
+        e.data.text().then(text => {
+            let name = text.slice(0, -1)
+            if (text.endsWith("1")) {
+                document.getElementById("userslist").appendChild("<li class = 'list-group-item-secondary list-group-item text-decoration-none d-block p-3'>" + name + "</li>");
+            } else if (text.endsWith("0")) {
+                console.log("Left")
+            }
+        })
+    });*@

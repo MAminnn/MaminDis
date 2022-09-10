@@ -1,0 +1,126 @@
+﻿@{
+    Layout = null;
+}
+@model IEnumerable<Room>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>صفحه اصلی</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MaminDis.styles.css" asp-append-version="true" />
+    <script src="//cdn.rawgit.com/dcodeIO/protobuf.js/6.X.X/dist/protobuf.js"></script>
+</head>
+<body dir="rtl">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item align-self-center" id="username">
+                            @User.Identity.Name
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="About">در باره ی ما</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3 text-center d-flex justify-content-center">
+            <div class="col-lg-4 col-md-6 col-9 text-center m-2">
+                <h3 class="h3">اتاق های موجود</h3>
+                <br />
+                <ul class="list-group">
+                    @{
+                        foreach (var room in @Model)
+                        {
+                            <li class="list-group-item-secondary list-group-item text-decoration-none">
+                                <a href="/enterroom/@room.Id" class="btn btn-block btn-secondary">@room.Title</a>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-4 col-2 text-center m-1">
+                <h3 class="h3">ساخت اتاق</h3>
+                <br />
+                <form class="form-group" asp-action="CreateRoom" asp-controller="Home">
+                    <span class="text-danger">فاصله خالی تو اسم ننداز</span>
+                    <input class="form-text form-control p-2" name="roomname" placeholder="نام اتاق" maxlength="20" required />
+                    <input type="submit" class="btn btn-success mt-2" value="ایجاد"/>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2022 - MaminDis - <a asp-area="" asp-controller="Home" asp-action="About">About</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+    </script>
+
+</body>
+</html>
+@*<script>
+
+    const socket = new WebSocket("ws://localhost:5090/chat/enterroom");
+    socket.binaryType = "arraybuffer";
+    function MakeReceiver() {
+        const context = new AudioContext();
+        socket.addEventListener("message", (e) => {
+
+            var myArrayBuffer = new AudioBuffer({
+                length:1024,
+                sampleRate:48000
+            })
+
+            myArrayBuffer.copyToChannel((new Float32Array(e.data)),0,0)
+            console.log((new Float32Array(e.data)),0,0)
+            console.log(myArrayBuffer)
+            const source = context.createBufferSource();
+
+            source.buffer = myArrayBuffer;
+
+            source.connect(context.destination);
+
+            source.start();
+
+        });
+    }
+    function MakeSender() {
+        var audiobuffers = [];
+        const handleSuccess = function(stream) {
+            const context = new AudioContext();
+            const source = context.createMediaStreamSource(stream);
+            const processor = context.createScriptProcessor(1024, 1, 1);
+
+            source.connect(processor);
+            processor.connect(context.destination);
+
+            var ctx = new AudioContext();
+            processor.onaudioprocess = function(e) {
+                var array = new Float32Array(1024);
+                e.inputBuffer.copyFromChannel(array, 0, 0);
+                socket.send(array);
+            };
+        };
+
+        navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+            .then(handleSuccess);
+    }
+</script>*@

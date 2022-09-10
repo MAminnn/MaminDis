@@ -1,0 +1,37 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ورود</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MaminDis.styles.css" asp-append-version="true" />
+    <script src="//cdn.rawgit.com/dcodeIO/protobuf.js/6.X.X/dist/protobuf.js"></script>
+</head>
+<body>
+
+</body>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    let username = "";
+    while (username.trim() == "" || username.length > 14 || username == null) {
+        username = window.prompt("نام خود را وارد کنید (حداکثر 14 کاراکتر) در صورتی که به همین صفحه بازگشتید بدانید این نام قبلا انتخاب شده و شما باید نام دیگری برگزینید")
+        if (username === null) {
+            username = ""
+        }
+    }
+    $.ajax({
+        type: "POST",
+        url: "/home/login",
+        data: {
+            "name": username.toString()
+        }, success: () => {
+            document.location = "@ViewBag.IndexUrl"
+        }
+    });
+</script>
+</html>
